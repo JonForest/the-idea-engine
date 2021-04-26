@@ -22,11 +22,3 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
   }
 }
-
-export function getStaticProps(context): GetStaticProps  {
-  return {
-    props: {
-      rndNumber: 2
-    }
-  }
-}
