@@ -41,6 +41,7 @@ export default function NewProblemPage() {
           </label>
           <textarea id="notes" name="notes" value={formVals.notes}
             className="w-full h-60 border-0 text-sm rounded-sm resize-none"
+            onChange={(e) => setFormVals({ ...formVals, notes: e.target.value })}
           ></textarea>
         </div>
         <div className="flex-grow"></div>
