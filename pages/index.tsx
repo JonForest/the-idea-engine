@@ -1,27 +1,40 @@
-import Head from 'next/head';
-import Button from '../components/button';
 import Link from 'next/link';
-import Banner from '../components/banner';
-import ProblemPanel from '../components/problem-panel';
+import ProblemPanel from '../components/problem_panel';
 import Layout from '../components/layout';
+import BufferedContent from '../components/buffered_content'
+import React, { useState } from 'react';
+
+const panels = [1,2,3,4,5]
 
 export default function Home() {
+  const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(1)
+
   return (
     <Layout>
-      <div className='flex flex-column w-full'>
-        <Link href='/new_problem'>
-          <a className='w-full flex justify-center'>
-            <button className='w-full border-black bg-green-700 text-white text-2xl p-4 rounded-xl shadow-2xl'>
+      <BufferedContent>
+        <Link href="/new_problem">
+          <a className="w-full flex justify-center">
+            <button className="w-full border-black bg-green-700 text-white text-2xl p-4 rounded-xl shadow-2xl">
               Log a problem
             </button>
           </a>
         </Link>
-      </div>
-      <div className='mt-8'>
-        <h2> Today's problems</h2>
+      </BufferedContent>
+
+      <div className="mt-12">
+        <BufferedContent>
+          <h2 className="text-xl mb-8"> Today's problems</h2>
+        </BufferedContent>
         <div>
           {/* Panels */}
-          <ProblemPanel />
+          <div className="flex overflow-hidden relative h-80">
+            {panels.map((panel, index) => (
+
+            <div style={{ position: 'absolute', left: `${(((index - selectedPanelIndex) * 280) + 90)}px` }}>
+              <ProblemPanel onClick={() => setSelectedPanelIndex(index)}/>
+            </div>
+            ))}
+          </div>
         </div>
       </div>
     </Layout>
