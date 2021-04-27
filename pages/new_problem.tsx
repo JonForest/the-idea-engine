@@ -3,13 +3,14 @@ import Link from 'next/link';
 import React, { BaseSyntheticEvent, SyntheticEvent, useState } from 'react';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
+import { saveProblem } from '../utils/data_connectivity'
 
 export default function NewProblemPage() {
   const [formVals, setFormVals] = useState<{ problem: string; notes: string }>({ problem: '', notes: '' });
   const router = useRouter();
   const isSubmittable = formVals.problem.trim() !== '';
 
-  function saveForm(e: BaseSyntheticEvent) {
+  async function saveForm(e: BaseSyntheticEvent) {
     e.preventDefault();
     const problem = e.target.problem;
 
@@ -17,6 +18,7 @@ export default function NewProblemPage() {
     if (formVals.problem.trim() === '') return;
 
     // todo: save
+    await saveProblem(formVals)
 
     router.push('/');
   }
