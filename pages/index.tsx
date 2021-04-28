@@ -3,11 +3,13 @@ import ProblemPanel from '../components/problem_panel';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content'
 import React, { useState } from 'react';
+import { retrieveProblems } from '../utils/data_connectivity';
+
 
 const panels = [1,2,3,4,5]
 
-export default function Home() {
-  const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(1)
+export default function Home({problems}) {
+  const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0)
 
   return (
     <Layout>
@@ -28,10 +30,10 @@ export default function Home() {
         <div>
           {/* Panels */}
           <div className="flex overflow-hidden relative h-80">
-            {panels.map((panel, index) => (
+            {problems.map((problem, index) => (
 
             <div style={{ position: 'absolute', left: `${(((index - selectedPanelIndex) * 280) + 90)}px` }}>
-              <ProblemPanel onClick={() => setSelectedPanelIndex(index)}/>
+              <ProblemPanel problem={problem} onClick={() => setSelectedPanelIndex(index)}/>
             </div>
             ))}
           </div>
@@ -39,4 +41,11 @@ export default function Home() {
       </div>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  const problems = await retrieveProblems()
+  return {
+    props: { problems }, // will be passed to the page component as props
+  }
 }

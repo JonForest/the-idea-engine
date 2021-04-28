@@ -17,13 +17,36 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
-export async function saveProblem(problem: Partial<Problem>) {
-  const dateString = new Date().toISOString().slice(0, 10);
+function getToday() {
+return new Date().toISOString().slice(0, 10);
+}
+
+function getBaseRef(dateString: string) {
+  return db.collection('days').doc(dateString).collection('problems')
+}
+
+/**
+ * Save a problem (either new or existing) to the database
+ */
+export async function saveProblem(problem: Partial<Problem>): Promise<void> {
+  const dateString = getToday()
   // TODO: Add user info
+  // TODO: Add in a createdAt, updatedAt timesetamp, and merge the updates rather than over-writing
   let docRef: firebase.firestore.DocumentReference<firebase.firestore.DocumentData> | void
   if (problem?.id) {
-    docRef = await db.collection('days').doc(dateString).collection('problems').doc(problem.id).set(problem);
+    docRef = await getBaseRef(dateString).doc(problem.id).set(problem);
   } else {
-    docRef = await db.collection('days').doc(dateString).collection('problems').add(problem);
+    docRef = await getBaseRef(dateString).add(problem);
   }
+}
+
+/**
+ * Retrieve a list of all problems for the current day
+ */
+export async function retrieveProblems(): Promise<Problem[]> {
+  const dateString = getToday()
+  const queryResults = await getBaseRef(dateString).get()
+  const problems = []
+  queryResults.forEach(result => problems.push({...result.data(), id: result.id}))
+  return problems
 }
