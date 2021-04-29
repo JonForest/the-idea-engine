@@ -1,15 +1,19 @@
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import ProblemPanel from '../components/problem_panel';
 import Layout from '../components/layout';
-import BufferedContent from '../components/buffered_content'
+import BufferedContent from '../components/buffered_content';
 import React, { useState } from 'react';
 import { retrieveProblems } from '../utils/data_connectivity';
+import { Router } from 'next/router';
 
+const panels = [1, 2, 3, 4, 5];
 
-const panels = [1,2,3,4,5]
+export default function Home({ problems }) {
+  const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
+  const router = useRouter()
 
-export default function Home({problems}) {
-  const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0)
 
   return (
     <Layout>
@@ -31,10 +35,14 @@ export default function Home({problems}) {
           {/* Panels */}
           <div className="flex overflow-hidden relative h-80">
             {problems.map((problem, index) => (
-
-            <div style={{ position: 'absolute', left: `${(((index - selectedPanelIndex) * 280) + 90)}px` }}>
-              <ProblemPanel problem={problem} onClick={() => setSelectedPanelIndex(index)}/>
-            </div>
+              <div style={{ position: 'absolute', left: `${(index - selectedPanelIndex) * 280 + 90}px` }}>
+                <ProblemPanel
+                  problem={problem}
+                  onClick={() =>
+                    index === selectedPanelIndex ? router.push(`edit_problem/${problem.id}`): setSelectedPanelIndex(index)
+                  }
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -43,9 +51,9 @@ export default function Home({problems}) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const problems = await retrieveProblems()
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const problems = await retrieveProblems();
   return {
     props: { problems }, // will be passed to the page component as props
-  }
+  };
 }

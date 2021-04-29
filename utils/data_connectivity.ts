@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 
-import { Problem } from './types';
+import { Problem, DateString } from './types';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDRfaebDobUXhqBcjtfcL_uBKonmYK49CE',
@@ -17,36 +17,42 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
-function getToday() {
-return new Date().toISOString().slice(0, 10);
-}
-
-function getBaseRef(dateString: string) {
-  return db.collection('days').doc(dateString).collection('problems')
+export function getToday(): DateString {
+  return new Date().toISOString().slice(0, 10) as DateString;
 }
 
 /**
  * Save a problem (either new or existing) to the database
  */
 export async function saveProblem(problem: Partial<Problem>): Promise<void> {
-  const dateString = getToday()
+  const dateString = getToday();
   // TODO: Add user info
   // TODO: Add in a createdAt, updatedAt timesetamp, and merge the updates rather than over-writing
-  let docRef: firebase.firestore.DocumentReference<firebase.firestore.DocumentData> | void
+  let docRef: firebase.firestore.DocumentReference<firebase.firestore.DocumentData> | void;
   if (problem?.id) {
-    docRef = await getBaseRef(dateString).doc(problem.id).set(problem);
+    docRef = await db.collection('problems').doc(problem.id).set(problem);
   } else {
-    docRef = await getBaseRef(dateString).add(problem);
+    docRef = await db.collection('problems').add(problem);
   }
 }
 
 /**
  * Retrieve a list of all problems for the current day
  */
-export async function retrieveProblems(): Promise<Problem[]> {
-  const dateString = getToday()
-  const queryResults = await getBaseRef(dateString).get()
-  const problems = []
-  queryResults.forEach(result => problems.push({...result.data(), id: result.id}))
-  return problems
+export async function retrieveProblems(date: string = getToday()): Promise<Problem[]> {
+  const queryResults = await db.collection('problems').where('date', '==', date).get()
+  const problems = [];
+  queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
+  return problems;
+}
+
+/**
+ * Retrieves an individual problem
+ * @throws {Error} If no problem exists for the provided ID
+ */
+export async function retrieveProblem(problemId): Promise<Problem> {
+  const docSnapshot = await db.collection('problems').doc(problemId).get()
+  const problem = docSnapshot.data()
+  if (!problem) throw new Error('No problem with that ID found')
+  return problem as Problem
 }
