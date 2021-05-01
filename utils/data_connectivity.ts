@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import { stringify } from 'node:querystring';
 
 import { Problem, DateString } from './types';
 
@@ -18,7 +19,9 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 export function getToday(): DateString {
-  return new Date().toISOString().slice(0, 10) as DateString;
+  const today = new Date()
+  const padElement = (dateEle: number):string => dateEle < 10 ? '0' + String(dateEle) : String(dateEle)
+  return `${today.getFullYear()}-${padElement(today.getMonth()+1)}-${padElement(today.getDate())}` as DateString
 }
 
 /**

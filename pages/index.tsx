@@ -1,19 +1,45 @@
+import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import ProblemPanel from '../components/problem_panel';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
-import React, { useState } from 'react';
 import { retrieveProblems } from '../utils/data_connectivity';
-import { Router } from 'next/router';
+import { useGesture } from 'react-use-gesture';
+import EventEmitter from 'node:events';
 
 const panels = [1, 2, 3, 4, 5];
 
 export default function Home({ problems }) {
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
-  const router = useRouter()
+  const router = useRouter();
+  const [offsetPosition, setOffsetPosition] = useState<number>(0);
+  // const panelsRef = useRef();
 
+  const bind = useGesture(
+    {
+      onDrag: ({ event, movement: [mx, my] }) => {
+        // console.log(event);
+        // event.preventDefault();
+        event.stopPropagation();
+        event.preventDefault()
+        console.log(event)
+        console.log(mx,my)
+        setOffsetPosition(mx)
+      },
+      onDragEnd: ({event}) => {
+        console.log('drag ending')
+      }
+    },
+    {
+      // eventOptions: { passive: false },
+      drag: {
+        filterTaps: true,
+        initial: () => [offsetPosition, 0]
+      }
+    }
+  );
 
   return (
     <Layout>
@@ -35,7 +61,12 @@ export default function Home({ problems }) {
           {/* Panels */}
           <div className="flex overflow-hidden relative h-80">
             {problems.map((problem, index) => (
-              <div style={{ position: 'absolute', left: `${(index - selectedPanelIndex) * 280 + 90}px` }}>
+              <div
+                key={problem.id}
+                className="border-black border-solid border-2"
+                style={{ position: 'absolute', left: `${(index - selectedPanelIndex) * 280 + 90 + offsetPosition}px` }}
+                {...bind()}
+              >
                 <ProblemPanel
                   problem={problem}
                   onClick={() =>
@@ -56,4 +87,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: { problems }, // will be passed to the page component as props
   };
-}
+};
+
+
+//     <ProblemPanel
+// problem={problem}
+// onClick={() =>
+//   index === selectedPanelIndex
+//     ? router.push(`edit_problem/${problem.id}`)
+//     : setSelectedPanelIndex(index)
+// }
