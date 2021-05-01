@@ -69,7 +69,7 @@ export default function EditProblem({problem}: EditProblemInterface) {
                 <button className="w-full bg-blue-200 text-black text-xl px-4 py-1 rounded-sm shadow-md">Cancel</button>
               </a>
             </Link>
-            <div className="inline-block box-border pl-3 w-1/2">
+            <div className="inline-block box-border pl-3 w-1/2 mb-4">
               <button
                 type="submit"
                 disabled={!isSubmittable}

@@ -46,7 +46,7 @@ export default function Home({ problems }) {
       <BufferedContent>
         <Link href="/new_problem">
           <a className="w-full flex justify-center">
-            <button className="w-full border-black bg-green-700 text-white text-2xl p-4 rounded-xl shadow-2xl">
+            <button className="w-full border-black bg-orange-500 text-white text-2xl p-4 rounded-xl shadow-2xl">
               Log a problem
             </button>
           </a>
@@ -55,7 +55,7 @@ export default function Home({ problems }) {
 
       <div className="mt-12">
         <BufferedContent>
-          <h2 className="text-xl mb-8"> Today's problems</h2>
+          <h2 className="text-xl mb-8">Today's problems</h2>
         </BufferedContent>
         <div>
           {/* Panels */}
@@ -63,7 +63,6 @@ export default function Home({ problems }) {
             {problems.map((problem, index) => (
               <div
                 key={problem.id}
-                className="border-black border-solid border-2"
                 style={{ position: 'absolute', left: `${(index - selectedPanelIndex) * 280 + 90 + offsetPosition}px` }}
                 {...bind()}
               >
