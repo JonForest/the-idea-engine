@@ -1,7 +1,7 @@
 
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import React, { BaseSyntheticEvent, SyntheticEvent, useState } from 'react';
+import React, { BaseSyntheticEvent, SyntheticEvent, useEffect, useState } from 'react';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
 import { getToday, saveProblem } from '../utils/data_connectivity'
@@ -9,14 +9,24 @@ import { Problem } from '../utils/types';
 
 
 interface EditProblemInterface {
-  problem: Problem | null
+  problem: Problem | null,
+  isLoading?: boolean,
 }
 
-export default function EditProblem({problem}: EditProblemInterface) {
-  const [formVals, setFormVals] = useState<Partial<Problem>>(problem || { problem: '', notes: '' });
+export default function EditProblem({isLoading = false, problem}: EditProblemInterface) {
   const router = useRouter();
+  const [formVals, setFormVals] = useState<Partial<Problem>>({ problem: '', notes: '' });
+
+  useEffect(() => {
+    if (!problem) return
+    setFormVals(problem)
+  }, [problem])
+
   const isSubmittable = formVals.problem.trim() !== '';
 
+  /**
+   * Function to save the problem
+   */
   async function saveForm(e: BaseSyntheticEvent) {
     e.preventDefault();
 
@@ -34,6 +44,8 @@ export default function EditProblem({problem}: EditProblemInterface) {
     router.push('/');
   }
 
+  const loadingClasses = isLoading ? ' bg-gray-300 animate-pulse ' : ''
+
   return (
     <Layout>
       <BufferedContent>
@@ -45,8 +57,9 @@ export default function EditProblem({problem}: EditProblemInterface) {
             <textarea
               id="problem"
               name="problem"
+              disabled={isLoading}
               value={formVals.problem}
-              className="w-full h-60 border-0 text-sm rounded-sm resize-none"
+              className={`w-full h-60 border-0 text-sm rounded-sm resize-none ${loadingClasses}`}
               onChange={(e) => setFormVals({ ...formVals, problem: e.target.value })}
             ></textarea>
           </div>
@@ -57,8 +70,9 @@ export default function EditProblem({problem}: EditProblemInterface) {
             <textarea
               id="notes"
               name="notes"
+              disabled={isLoading}
               value={formVals.notes}
-              className="w-full h-60 border-0 text-sm rounded-sm resize-none"
+              className={`w-full h-60 border-0 text-sm rounded-sm resize-none ${loadingClasses}`}
               onChange={(e) => setFormVals({ ...formVals, notes: e.target.value })}
             ></textarea>
           </div>

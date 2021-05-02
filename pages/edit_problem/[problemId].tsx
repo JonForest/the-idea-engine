@@ -1,20 +1,11 @@
-import React from 'react'
+import React, {useState} from 'react'
+import { useRouter } from 'next/router'
+import useSWR from 'swr'
 import EditProblem from '../../components/problem_edit';
 import { retrieveProblem } from '../../utils/data_connectivity';
-import { Problem } from '../../utils/types';
 
-interface EditProblemPageInterface {
-  problem: Problem
-}
-
-export default function EditProblemPage({problem}: EditProblemPageInterface) {
-  return <EditProblem problem={problem} />
-}
-
-
-export async function getServerSideProps(context) {
-  const problem = await retrieveProblem(context.params.problemId)
-  return {
-    props: { problem }, // will be passed to the page component as props
-  };
+export default function EditProblemPage() {
+  const router = useRouter()
+  const {data, error } = useSWR(router.query.problemId, retrieveProblem)
+  return <EditProblem isLoading={!data} problem={data} />
 }

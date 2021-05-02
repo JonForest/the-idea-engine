@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { GetServerSideProps } from 'next';
+import useSWR from 'swr'
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import ProblemPanel from '../components/problem_panel';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
-import { retrieveProblems } from '../utils/data_connectivity';
+import { getToday, retrieveProblems } from '../utils/data_connectivity';
 import { useGesture } from 'react-use-gesture';
-import EventEmitter from 'node:events';
 
 const panels = [1, 2, 3, 4, 5];
 
-export default function Home({ problems }) {
+export default function Home() {
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
   const router = useRouter();
   const [offsetPosition, setOffsetPosition] = useState<number>(0);
-  // const panelsRef = useRef();
+  const {data, error} = useSWR(getToday(), retrieveProblems)
 
   const bind = useGesture(
     {
@@ -60,7 +59,7 @@ export default function Home({ problems }) {
         <div>
           {/* Panels */}
           <div className="flex overflow-hidden relative h-80">
-            {problems.map((problem, index) => (
+            {data && data.map((problem, index) => (
               <div
                 key={problem.id}
                 style={{ position: 'absolute', left: `${(index - selectedPanelIndex) * 280 + 90 + offsetPosition}px` }}
@@ -80,13 +79,6 @@ export default function Home({ problems }) {
     </Layout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const problems = await retrieveProblems();
-  return {
-    props: { problems }, // will be passed to the page component as props
-  };
-};
 
 
 //     <ProblemPanel

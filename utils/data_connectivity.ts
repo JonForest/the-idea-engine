@@ -53,9 +53,15 @@ export async function retrieveProblems(date: string = getToday()): Promise<Probl
  * Retrieves an individual problem
  * @throws {Error} If no problem exists for the provided ID
  */
-export async function retrieveProblem(problemId): Promise<Problem> {
+export async function retrieveProblem(problemId): Promise<Problem|undefined> {
+  if (!problemId) return
   const docSnapshot = await db.collection('problems').doc(problemId).get()
   const problem = docSnapshot.data()
   if (!problem) throw new Error('No problem with that ID found')
   return problem as Problem
+}
+
+
+export function fetcher (url, options) {
+  return fetch(url, options).then(res => res.json())
 }
