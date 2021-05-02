@@ -5,4 +5,12 @@ export interface Problem {
   problem: string;
   notes: string;
   date: DateString;
+  isProcessed: boolean;
+}
+
+
+export enum DateRanges {
+  TODAY = 'today',
+  LAST_SEVEN_DAYS = 'last_seven_days',
+  ALL=  'all'
 }

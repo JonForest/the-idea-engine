@@ -15,7 +15,7 @@ interface EditProblemInterface {
 
 export default function EditProblem({isLoading = false, problem}: EditProblemInterface) {
   const router = useRouter();
-  const [formVals, setFormVals] = useState<Partial<Problem>>({ problem: '', notes: '' });
+  const [formVals, setFormVals] = useState<Partial<Problem>>({ problem: '', notes: '', isProcessed: false });
 
   useEffect(() => {
     if (!problem) return

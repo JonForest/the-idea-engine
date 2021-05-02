@@ -3,7 +3,7 @@ import Banner from './banner';
 
 export default function Layout({ children }: PropsWithChildren<{}>) {
   return (
-    <div className='min-h-screen bg-gray-100'>
+    <div>
       <Banner />
       <div className='pt-28'>
       {children}

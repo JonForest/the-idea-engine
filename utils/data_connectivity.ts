@@ -1,7 +1,7 @@
 import firebase from 'firebase';
 import { stringify } from 'node:querystring';
 
-import { Problem, DateString } from './types';
+import { Problem, DateString, DateRanges } from './types';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDRfaebDobUXhqBcjtfcL_uBKonmYK49CE',
@@ -18,10 +18,14 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
+function formatDate(date: Date): DateString {
+  const padElement = (dateEle: number): string => (dateEle < 10 ? '0' + String(dateEle) : String(dateEle));
+  return `${date.getFullYear()}-${padElement(date.getMonth() + 1)}-${padElement(date.getDate())}` as DateString;
+}
+
 export function getToday(): DateString {
-  const today = new Date()
-  const padElement = (dateEle: number):string => dateEle < 10 ? '0' + String(dateEle) : String(dateEle)
-  return `${today.getFullYear()}-${padElement(today.getMonth()+1)}-${padElement(today.getDate())}` as DateString
+  const today = new Date();
+  return formatDate(today);
 }
 
 /**
@@ -43,7 +47,7 @@ export async function saveProblem(problem: Partial<Problem>): Promise<void> {
  * Retrieve a list of all problems for the current day
  */
 export async function retrieveProblems(date: string = getToday()): Promise<Problem[]> {
-  const queryResults = await db.collection('problems').where('date', '==', date).get()
+  const queryResults = await db.collection('problems').where('date', '==', date).get();
   const problems = [];
   queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
   return problems;
@@ -53,15 +57,35 @@ export async function retrieveProblems(date: string = getToday()): Promise<Probl
  * Retrieves an individual problem
  * @throws {Error} If no problem exists for the provided ID
  */
-export async function retrieveProblem(problemId): Promise<Problem|undefined> {
-  if (!problemId) return
-  const docSnapshot = await db.collection('problems').doc(problemId).get()
-  const problem = {...docSnapshot.data(), id: docSnapshot.id}
-  if (!problem) throw new Error('No problem with that ID found')
-  return problem as Problem
+export async function retrieveProblem(problemId): Promise<Problem | undefined> {
+  if (!problemId) return;
+  const docSnapshot = await db.collection('problems').doc(problemId).get();
+  const problem = { ...docSnapshot.data(), id: docSnapshot.id };
+  if (!problem) throw new Error('No problem with that ID found');
+  return problem as Problem;
 }
 
+export async function retrieveProblemRange(dateRange: DateRanges): Promise<Problem[]> {
+  const startDate = {
+    [DateRanges.TODAY]: getToday(),
+    [DateRanges.LAST_SEVEN_DAYS]: (() => {
+      const today = new Date();
+      const sevenDaysAgo = today.setDate(today.getDate() - 7);
+      return formatDate(new Date(sevenDaysAgo));
+    })(),
+  }[dateRange];
 
-export function fetcher (url, options) {
-  return fetch(url, options).then(res => res.json())
+  let queryResults: firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>;
+  if (startDate) {
+    queryResults = await db
+      .collection('problems')
+      .where('date', '>=', startDate)
+      .get();
+  } else {
+    queryResults = await db.collection('problems').get();
+  }
+
+  const problems = [];
+  queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
+  return problems;
 }
