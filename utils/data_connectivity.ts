@@ -56,7 +56,7 @@ export async function retrieveProblems(date: string = getToday()): Promise<Probl
 export async function retrieveProblem(problemId): Promise<Problem|undefined> {
   if (!problemId) return
   const docSnapshot = await db.collection('problems').doc(problemId).get()
-  const problem = docSnapshot.data()
+  const problem = {...docSnapshot.data(), id: docSnapshot.id}
   if (!problem) throw new Error('No problem with that ID found')
   return problem as Problem
 }
