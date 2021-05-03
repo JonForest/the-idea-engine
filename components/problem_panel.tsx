@@ -3,26 +3,20 @@ import ReactMarkdown from 'react-markdown';
 import { deleteProblem } from '../utils/data_connectivity';
 import { Problem } from '../utils/types';
 
-const data = {
-  problem: "Can't program fast enough to be valuable",
-  notes: 'Just not thinking in the right ways to be *quick*',
-};
-
 interface ProblemPanelInterface {
   onClick: () => void;
   problem: Problem;
-  onDelete?: () => void
+  onDelete?: () => void;
 }
 
 export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPanelInterface) {
   async function deleteAction(e: React.SyntheticEvent, problemId: string) {
-    e.preventDefault() // probably superfluous
-    e.stopPropagation() // necessary to stop navigation to the problem
-    await deleteProblem(problemId)
-    if (!onDelete) throw new Error('onDelete not specified')
-    await onDelete()
+    e.preventDefault(); // probably superfluous
+    e.stopPropagation(); // necessary to stop navigation to the problem
+    await deleteProblem(problemId);
+    if (!onDelete) throw new Error('onDelete not specified');
+    await onDelete();
   }
-
 
   return (
     <div
@@ -40,7 +34,12 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
         </div>
       </div>
       <div className="mt-4 justify-self-end">
-        <button className="w-4/5 px-4 py-1 bg-red-800 rounded-md m-4 shadow-lg" onClick={(e) => deleteAction(e, problem.id)}>Discard</button>
+        <button
+          className="w-4/5 px-4 py-1 bg-red-800 rounded-md m-4 shadow-lg"
+          onClick={(e) => deleteAction(e, problem.id)}
+        >
+          Discard
+        </button>
       </div>
     </div>
   );
