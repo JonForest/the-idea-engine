@@ -26,10 +26,10 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
 
   return (
     <div
-      className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-xl p-2 bg-white text-black"
+      className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-xl p-2 bg-gray-500 text-black"
       onClick={onClick}
     >
-      <div className="overflow-y-auto h-60">
+      <div className="overflow-hidden h-60">
         <h3 className="font-bold">Problem</h3>
         <div>
           <ReactMarkdown>{problem.problem}</ReactMarkdown>
@@ -40,7 +40,7 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
         </div>
       </div>
       <div className="mt-4 justify-self-end">
-        <button className="w-4/5 px-4 py-1 bg-red-200 rounded-md m-4 shadow-lg" onClick={(e) => deleteAction(e, problem.id)}>Discard</button>
+        <button className="w-4/5 px-4 py-1 bg-red-800 rounded-md m-4 shadow-lg" onClick={(e) => deleteAction(e, problem.id)}>Discard</button>
       </div>
     </div>
   );
