@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import useSWR from 'swr';
+import useSWR, {mutate} from 'swr';
 import BufferedContent from '../components/buffered_content';
 import Layout from '../components/layout';
 import ProblemPanel, { ProblemPanelLoading } from '../components/problem_panel';
@@ -14,6 +14,14 @@ export default function ReviewProblems() {
   const {data, error} = useSWR(dateKey, retrieveProblemRange)
   const isLoading = !data;
   const selected ="pb-1 border-b-2 border-purple-700"
+
+  /**
+   * Called when a problem has been deleted
+   * Mutates the SWR key such it refetches
+   */
+  function onProblemDelete() {
+    mutate(dateKey)
+  }
 
   return (
     <Layout>
@@ -44,6 +52,7 @@ export default function ReviewProblems() {
                   <ProblemPanel
                     problem={problem}
                     onClick={() => router.push(`edit_problem/${problem.id}`)}
+                    onDelete={onProblemDelete}
                   />
                 </div>
               ))}

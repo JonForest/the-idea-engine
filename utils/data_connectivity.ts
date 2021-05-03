@@ -89,3 +89,8 @@ export async function retrieveProblemRange(dateRange: DateRanges): Promise<Probl
   queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
   return problems;
 }
+
+export async function deleteProblem(problemId: string): Promise<void> {
+  await db.collection('problems').doc(problemId).delete();
+  return
+}

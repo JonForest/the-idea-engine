@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { deleteProblem } from '../utils/data_connectivity';
 import { Problem } from '../utils/types';
 
 const data = {
@@ -10,9 +11,19 @@ const data = {
 interface ProblemPanelInterface {
   onClick: () => void;
   problem: Problem;
+  onDelete?: () => void
 }
 
-export default function ProblemPanel({ problem, onClick }) {
+export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPanelInterface) {
+  async function deleteAction(e: React.SyntheticEvent, problemId: string) {
+    e.preventDefault() // probably superfluous
+    e.stopPropagation() // necessary to stop navigation to the problem
+    await deleteProblem(problemId)
+    if (!onDelete) throw new Error('onDelete not specified')
+    await onDelete()
+  }
+
+
   return (
     <div
       className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-xl p-2 bg-white text-black"
@@ -29,7 +40,7 @@ export default function ProblemPanel({ problem, onClick }) {
         </div>
       </div>
       <div className="mt-4 justify-self-end">
-        <button className="w-4/5 px-4 py-1 bg-red-200 rounded-md m-4 shadow-lg">Discard</button>
+        <button className="w-4/5 px-4 py-1 bg-red-200 rounded-md m-4 shadow-lg" onClick={(e) => deleteAction(e, problem.id)}>Discard</button>
       </div>
     </div>
   );
