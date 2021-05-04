@@ -58,25 +58,22 @@ export default function Home() {
           <h2 className="text-xl mb-8">Today's problems</h2>
         </BufferedContent>
         <div>
-          {/* Panels */}
+         {/* Panels */}
           <div className="flex overflow-hidden relative h-80">
             {data &&
               data.map((problem, index) => (
                 <div
                   key={problem.id}
                   style={{
+                    touchAction: "pan-y",
                     position: 'absolute',
-                    left: `${(index - selectedPanelIndex) * 330 + 110 + offsetPosition}px`,
+                    left: `${(index - selectedPanelIndex) * 330 + 120 + offsetPosition}px`,
                   }}
                   {...bind()}
                 >
                   <ProblemPanel
                     problem={problem}
-                    onClick={() =>
-                      index === selectedPanelIndex
-                        ? router.push(`edit_problem/${problem.id}`)
-                        : setSelectedPanelIndex(index)
-                    }
+                    onClick={() => router.push(`edit_problem/${problem.id}`)}
                     onDelete={() => mutate(today)}
                   />
                 </div>
