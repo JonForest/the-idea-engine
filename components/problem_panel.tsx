@@ -20,7 +20,7 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
 
   return (
     <div
-      className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-xl p-2 bg-gray-500 text-black"
+      className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-sm p-2 bg-gray-500 text-black"
       onClick={onClick}
     >
       <div className="overflow-hidden h-60">
@@ -35,7 +35,7 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
       </div>
       <div className="mt-4 justify-self-end">
         <button
-          className="w-4/5 px-4 py-1 bg-red-800 rounded-md m-4 shadow-lg"
+          className="w-4/5 px-4 py-1 bg-red-800 rounded-sm m-4 shadow-lg"
           onClick={(e) => deleteAction(e, problem.id)}
         >
           Discard
@@ -47,6 +47,6 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
 
 export function ProblemPanelLoading() {
   return (
-    <div className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-xl p-2 bg-gray-300 text-black animate-pulse mx-6"></div>
+    <div className="flex flex-col justify-between shadow-xl w-72 h-72 overflow-hidden rounded-sm p-2 bg-gray-300 text-black animate-pulse mx-6"></div>
   );
 }

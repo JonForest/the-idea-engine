@@ -1,26 +1,25 @@
-
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import React, { BaseSyntheticEvent, SyntheticEvent, useEffect, useState } from 'react';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
-import { getToday, saveProblem } from '../utils/data_connectivity'
+import { getToday, saveProblem } from '../utils/data_connectivity';
 import { Problem } from '../utils/types';
 
-
 interface EditProblemInterface {
-  problem: Problem | null,
-  isLoading?: boolean,
+  problem: Problem | null;
+  returnUrl: string;
+  isLoading?: boolean;
 }
 
-export default function EditProblem({isLoading = false, problem}: EditProblemInterface) {
+export default function EditProblem({ isLoading = false, problem, returnUrl }: EditProblemInterface) {
   const router = useRouter();
   const [formVals, setFormVals] = useState<Partial<Problem>>({ problem: '', notes: '', isProcessed: false });
 
   useEffect(() => {
-    if (!problem) return
-    setFormVals(problem)
-  }, [problem])
+    if (!problem) return;
+    setFormVals(problem);
+  }, [problem]);
 
   const isSubmittable = formVals.problem.trim() !== '';
 
@@ -35,16 +34,16 @@ export default function EditProblem({isLoading = false, problem}: EditProblemInt
 
     const problem = {
       ...formVals,
-      date: getToday()
-    }
+      date: getToday(),
+    };
 
     // todo: save
-    await saveProblem(problem)
+    await saveProblem(problem);
 
     router.push('/');
   }
 
-  const loadingClasses = isLoading ? ' bg-gray-300 animate-pulse ' : ''
+  const loadingClasses = isLoading ? ' bg-gray-300 animate-pulse ' : '';
 
   return (
     <Layout>
@@ -78,7 +77,7 @@ export default function EditProblem({isLoading = false, problem}: EditProblemInt
           </div>
           <div className="flex-grow"></div>
           <div>
-            <Link href="/">
+            <Link href={returnUrl}>
               <a className="box-border inline-block pr-3 w-1/2 underline">
                 <button className="w-full bg-blue-200 text-black text-xl px-4 py-1 rounded-sm shadow-md">Cancel</button>
               </a>

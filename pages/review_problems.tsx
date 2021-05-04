@@ -1,5 +1,6 @@
+import { route } from 'next/dist/next-server/server/router';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import BufferedContent from '../components/buffered_content';
 import Layout from '../components/layout';
@@ -9,19 +10,15 @@ import { DateRanges } from '../utils/types';
 
 export default function ReviewProblems() {
   const router = useRouter();
+  const range = router.query.range as DateRanges || null
   const [dateKey, setDateKey] = useState<DateRanges>(DateRanges.TODAY);
-  const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
+  useEffect(() => {
+    if (!range) return
+    setDateKey(range)
+  }, [range, dateKey])
   const { data, error } = useSWR(dateKey, retrieveProblemRange);
   const isLoading = !data;
   const selected = 'pb-1 border-b-4 border-purple-600';
-
-  /**
-   * Called when a problem has been deleted
-   * Mutates the SWR key such it refetches
-   */
-  function onProblemDelete() {
-    mutate(dateKey);
-  }
 
   return (
     <Layout>
@@ -30,19 +27,21 @@ export default function ReviewProblems() {
           <h1 className="block">Review problems</h1>
           <div>
             <button
-              onClick={() => setDateKey(DateRanges.TODAY)}
+              onClick={() => router.push(`/review_problems?range=${DateRanges.TODAY}`, undefined, {shallow: true})}
               className={`focus:outline-none text-sm ${dateKey === DateRanges.TODAY && selected}`}
             >
               Today
             </button>
             <button
-              onClick={() => setDateKey(DateRanges.LAST_SEVEN_DAYS)}
+              onClick={() =>
+                router.push(`/review_problems?range=${DateRanges.LAST_SEVEN_DAYS}`, undefined, {shallow: true})
+              }
               className={`focus:outline-none text-sm mx-4 ${dateKey === DateRanges.LAST_SEVEN_DAYS && selected}`}
             >
               Last 7 days
             </button>
             <button
-              onClick={() => setDateKey(DateRanges.ALL)}
+              onClick={() => router.push(`/review_problems?range=${DateRanges.ALL}`, undefined, {shallow: true})}
               className={`focus:outline-none text-sm ${dateKey === DateRanges.ALL && selected}`}
             >
               All time
@@ -64,8 +63,8 @@ export default function ReviewProblems() {
                   <div key={problem.id} className="m-6">
                     <ProblemPanel
                       problem={problem}
-                      onClick={() => router.push(`edit_problem/${problem.id}`)}
-                      onDelete={onProblemDelete}
+                      onClick={() => router.push(`edit_problem/${problem.id}?returnUrl=/review_problems?range=${dateKey}`)}
+                      onDelete={()=> mutate(dateKey)}
                     />
                   </div>
                 ))}

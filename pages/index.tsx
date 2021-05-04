@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import ProblemPanel from '../components/problem_panel';
@@ -14,7 +14,8 @@ export default function Home() {
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
   const router = useRouter();
   const [offsetPosition, setOffsetPosition] = useState<number>(0);
-  const { data, error } = useSWR(getToday(), retrieveProblems);
+  const today = getToday();
+  const { data, error } = useSWR(today, retrieveProblems);
 
   const bind = useGesture(
     {
@@ -45,7 +46,7 @@ export default function Home() {
       <BufferedContent>
         <Link href="/new_problem">
           <a className="w-full flex justify-center">
-            <button className="w-full border-black bg-orange-600 text-gray-800 text-2xl p-4 rounded-xl shadow-2xl">
+            <button className="w-full border-black bg-orange-600 text-gray-800 text-2xl p-4 rounded-sm shadow-2xl">
               Log a problem
             </button>
           </a>
@@ -76,6 +77,7 @@ export default function Home() {
                         ? router.push(`edit_problem/${problem.id}`)
                         : setSelectedPanelIndex(index)
                     }
+                    onDelete={() => mutate(today)}
                   />
                 </div>
               ))}
