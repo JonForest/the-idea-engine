@@ -46,7 +46,7 @@ export default function Home() {
       <BufferedContent>
         <Link href="/new_problem">
           <a className="w-full flex justify-center">
-            <button className="w-full border-black bg-orange-600 text-gray-800 text-2xl p-4 rounded-sm shadow-2xl">
+            <button className="w-full border-black bg-purple-800 text-gray-100 text-2xl p-4 rounded-sm shadow-2xl">
               Log a problem
             </button>
           </a>

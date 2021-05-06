@@ -58,7 +58,7 @@ export default function EditProblem({ isLoading = false, problem, returnUrl }: E
               name="problem"
               disabled={isLoading}
               value={formVals.problem}
-              className={`w-full h-60 border-0 text-sm rounded-sm resize-none ${loadingClasses}`}
+              className={`w-full h-60 border-0 text-gray-800 text-sm md:text-md lg:text-lg rounded-sm resize-none ${loadingClasses}`}
               onChange={(e) => setFormVals({ ...formVals, problem: e.target.value })}
             ></textarea>
           </div>
@@ -71,7 +71,7 @@ export default function EditProblem({ isLoading = false, problem, returnUrl }: E
               name="notes"
               disabled={isLoading}
               value={formVals.notes}
-              className={`w-full h-60 border-0 text-sm rounded-sm resize-none ${loadingClasses}`}
+              className={`w-full h-60 border-0 text-gray-800 text-sm md:text-md lg:text-lg rounded-sm resize-none ${loadingClasses}`}
               onChange={(e) => setFormVals({ ...formVals, notes: e.target.value })}
             ></textarea>
           </div>

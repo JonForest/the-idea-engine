@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { FaTrash } from 'react-icons/fa';
 import { deleteProblem } from '../utils/data_connectivity';
 import { Problem } from '../utils/types';
 
@@ -24,7 +25,16 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
       onClick={onClick}
     >
       <div className="overflow-hidden h-60">
-        <h3 className="font-bold">Problem</h3>
+        <div className="flex">
+          <h3 className="font-bold flex-grow">Problem</h3>
+          <button
+            className="flex-grow-0 rounded-sm py-1 px-2 bg-orange-800 text-gray-200 shadow-md active:shadow-none focus:outline-none"
+            onClick={(e) => deleteAction(e, problem.id)}
+          >
+            <FaTrash />
+          </button>
+        </div>
+
         <div>
           <ReactMarkdown>{problem.problem}</ReactMarkdown>
         </div>
@@ -34,12 +44,7 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
         </div>
       </div>
       <div className="mt-4 justify-self-end">
-        <button
-          className="w-4/5 px-4 py-1 bg-red-800 rounded-sm m-4 shadow-lg"
-          onClick={(e) => deleteAction(e, problem.id)}
-        >
-          Discard
-        </button>
+        <button className="w-4/5 px-4 py-1 bg-purple-800 rounded-sm m-4 shadow-lg">Define Solution</button>
       </div>
     </div>
   );
