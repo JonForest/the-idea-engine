@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import React, { BaseSyntheticEvent, SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
 import { getToday, saveProblem } from '../utils/data_connectivity';
@@ -26,7 +26,7 @@ export default function EditProblem({ isLoading = false, problem, returnUrl }: E
   /**
    * Function to save the problem
    */
-  async function saveForm(e: BaseSyntheticEvent) {
+  async function saveForm(e: SyntheticEvent) {
     e.preventDefault();
 
     // No error logged, as this shouldn't be able to happeb
