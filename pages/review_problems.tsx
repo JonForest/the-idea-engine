@@ -9,7 +9,7 @@ import useUser from '../utils/hooks';
 import { DateRanges } from '../utils/types';
 
 export default function ReviewProblems() {
-  useUser();
+  const { user } = useUser();
   const router = useRouter();
   const range = (router.query.range as DateRanges) || null;
   const [dateKey, setDateKey] = useState<DateRanges>(DateRanges.TODAY);
@@ -17,7 +17,7 @@ export default function ReviewProblems() {
     if (!range) return;
     setDateKey(range);
   }, [range, dateKey]);
-  const { data, error } = useSWR(dateKey, retrieveProblemRange);
+  const { data, error } = useSWR(dateKey + user?.uid, () => retrieveProblemRange(user.uid, dateKey));
   const isLoading = !data;
   const selected = 'pb-1 border-b-4 border-purple-600';
 
@@ -67,7 +67,7 @@ export default function ReviewProblems() {
                       onClick={() =>
                         router.push(`edit_problem/${problem.id}?returnUrl=/review_problems?range=${dateKey}`)
                       }
-                      onDelete={() => mutate(dateKey)}
+                      onDelete={() => mutate(dateKey + user.uid)}
                     />
                   </div>
                 ))}

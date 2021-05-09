@@ -3,7 +3,7 @@ import Link from 'next/link';
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
-import { getToday, saveProblem } from '../utils/data_connectivity';
+import { firebaseAuth, getToday, saveProblem } from '../utils/data_connectivity';
 import { Problem } from '../utils/types';
 
 interface EditProblemInterface {
@@ -15,6 +15,7 @@ interface EditProblemInterface {
 export default function EditProblem({ isLoading = false, problem, returnUrl }: EditProblemInterface) {
   const router = useRouter();
   const [formVals, setFormVals] = useState<Partial<Problem>>({ problem: '', notes: '', isProcessed: false });
+  const user = firebaseAuth.currentUser
 
   useEffect(() => {
     if (!problem) return;
@@ -38,7 +39,7 @@ export default function EditProblem({ isLoading = false, problem, returnUrl }: E
     };
 
     // todo: save
-    await saveProblem(problem);
+    await saveProblem(user.uid, problem);
 
     router.push('/');
   }

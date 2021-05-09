@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { FaTrash } from 'react-icons/fa';
-import { deleteProblem } from '../utils/data_connectivity';
+import { deleteProblem, firebaseAuth } from '../utils/data_connectivity';
 import { Problem } from '../utils/types';
 import { useRouter } from 'next/router';
 
@@ -13,10 +13,11 @@ interface ProblemPanelInterface {
 
 export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPanelInterface) {
   const router = useRouter();
+  const user = firebaseAuth.currentUser
   async function deleteAction(e: React.SyntheticEvent, problemId: string) {
     e.preventDefault(); // probably superfluous
     e.stopPropagation(); // necessary to stop navigation to the problem
-    await deleteProblem(problemId);
+    await deleteProblem(user.uid, problemId);
     if (!onDelete) throw new Error('onDelete not specified');
     await onDelete();
   }

@@ -12,12 +12,12 @@ import useUser from '../utils/hooks';
 const panels = [1, 2, 3, 4, 5];
 
 export default function Home() {
-  useUser();
+  const { user } = useUser();
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
   const router = useRouter();
   const [offsetPosition, setOffsetPosition] = useState<number>(0);
   const today = getToday();
-  const { data, error } = useSWR(today, retrieveProblems);
+  const { data } = useSWR(today + user?.uid, () => retrieveProblems(user?.uid, today));
 
   const bind = useGesture(
     {
@@ -76,7 +76,7 @@ export default function Home() {
                   <ProblemPanel
                     problem={problem}
                     onClick={() => router.push(`edit_problem/${problem.id}`)}
-                    onDelete={() => mutate(today)}
+                    onDelete={() => mutate(today + user.uid)}
                   />
                 </div>
               ))}
