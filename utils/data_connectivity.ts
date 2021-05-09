@@ -1,5 +1,4 @@
 import firebase from 'firebase';
-import { stringify } from 'node:querystring';
 
 import { Problem, DateString, DateRanges } from './types';
 
@@ -22,6 +21,8 @@ function formatDate(date: Date): DateString {
   const padElement = (dateEle: number): string => (dateEle < 10 ? '0' + String(dateEle) : String(dateEle));
   return `${date.getFullYear()}-${padElement(date.getMonth() + 1)}-${padElement(date.getDate())}` as DateString;
 }
+
+export const firebaseAuth = firebase.auth();
 
 export function getToday(): DateString {
   const today = new Date();
