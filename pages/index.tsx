@@ -7,10 +7,12 @@ import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
 import { getToday, retrieveProblems } from '../utils/data_connectivity';
 import { useGesture } from 'react-use-gesture';
+import useUser from '../utils/hooks';
 
 const panels = [1, 2, 3, 4, 5];
 
 export default function Home() {
+  useUser();
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
   const router = useRouter();
   const [offsetPosition, setOffsetPosition] = useState<number>(0);
@@ -58,14 +60,14 @@ export default function Home() {
           <h2 className="text-xl mb-8">Today's problems</h2>
         </BufferedContent>
         <div>
-         {/* Panels */}
+          {/* Panels */}
           <div className="flex overflow-hidden relative h-80">
             {data &&
               data.map((problem, index) => (
                 <div
                   key={problem.id}
                   style={{
-                    touchAction: "pan-y",
+                    touchAction: 'pan-y',
                     position: 'absolute',
                     left: `${(index - selectedPanelIndex) * 330 + 120 + offsetPosition}px`,
                   }}

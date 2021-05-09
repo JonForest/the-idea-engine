@@ -19,9 +19,9 @@ const uiConfig = {
 
 function SignInScreen() {
   return (
-    <Layout>
+    <Layout forceChildren={true}>
       <BufferedContent>
-        <div className="flex w-full items-center">
+        <div className="flex w-full justify-center">
           <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth} />
         </div>
       </BufferedContent>

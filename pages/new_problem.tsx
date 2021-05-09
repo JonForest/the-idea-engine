@@ -1,5 +1,7 @@
-import EditProblem from '../components/problem_edit'
+import EditProblem from '../components/problem_edit';
+import useUser from '../utils/hooks';
 
 export default function NewProblemPage() {
-  return <EditProblem problem={null} returnUrl="/"/>
+  useUser();
+  return <EditProblem problem={null} returnUrl="/" />;
 }

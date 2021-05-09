@@ -1,14 +1,15 @@
-import { route } from 'next/dist/next-server/server/router';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import BufferedContent from '../components/buffered_content';
 import Layout from '../components/layout';
 import ProblemPanel, { ProblemPanelLoading } from '../components/problem_panel';
 import { retrieveProblemRange } from '../utils/data_connectivity';
+import useUser from '../utils/hooks';
 import { DateRanges } from '../utils/types';
 
 export default function ReviewProblems() {
+  useUser();
   const router = useRouter();
   const range = (router.query.range as DateRanges) || null;
   const [dateKey, setDateKey] = useState<DateRanges>(DateRanges.TODAY);
