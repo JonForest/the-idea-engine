@@ -65,6 +65,7 @@ export default function ReviewProblems() {
                     <ProblemPanel
                       problem={problem}
                       onClick={() =>
+                        // todo: this is not consistent placing compared to the other actions in the problem panel
                         router.push(`edit_problem/${problem.id}?returnUrl=/review_problems?range=${dateKey}`)
                       }
                       onDelete={() => mutate(dateKey + user.uid)}

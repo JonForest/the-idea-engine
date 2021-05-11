@@ -9,7 +9,7 @@ export default function DefineSolutionPage() {
   const router = useRouter();
   const problemId = router.query.problemId;
   const returnUrl = (router.query.returnUrl as string) || '/';
-  const { data, error } = useSWR(problemId + user.uid, () => retrieveProblem(user.uid, problemId));
+  const { data, error } = useSWR(problemId + user?.uid, () => retrieveProblem(user?.uid, problemId));
 
   return <>{data && <h1>{data.problem}</h1>}</>;
 }

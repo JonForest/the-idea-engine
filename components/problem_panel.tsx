@@ -6,7 +6,7 @@ import { Problem } from '../utils/types';
 import { useRouter } from 'next/router';
 
 interface ProblemPanelInterface {
-  onClick: () => void;
+  onClick: () => void; // tODO: think this would make more sense as a string than a function
   problem: Problem;
   onDelete?: () => void;
 }
