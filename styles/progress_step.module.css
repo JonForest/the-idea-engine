@@ -1,0 +1,20 @@
+ul li.progressStep span.progressStepMarker:before{
+  content:'';
+  position:absolute;
+  --tw-border-opacity: 1;
+  /* @apply border-purple-800; */
+  border-color: rgba(216, 180, 254, var(--tw-border-opacity));
+  border-left:2px solid rgba(216, 180, 254, var(--tw-border-opacity));
+  left:11px; /* Moves where the line appears relative to circle */
+  bottom:0; /* TODO: Can remove? */
+  z-index:-1; /* Line appears behind spans */
+  height:100%
+}
+
+ul li.progressStep:last-child span.progressStepMarker:before{
+ content:none;
+}
+
+ul li.progressStep:last-child{
+  padding-bottom:0
+}

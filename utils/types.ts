@@ -6,6 +6,7 @@ export interface Problem {
   notes: string;
   date: DateString;
   isProcessed: boolean;
+  rootCause?: string;
 }
 
 

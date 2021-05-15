@@ -33,14 +33,14 @@ export function getToday(): DateString {
  * Save a problem (either new or existing) to the database
  */
 export async function saveProblem(userId: string, problem: Partial<Problem>): Promise<void> {
-  if (!userId) throw new Error('UserId not set')
+  if (!userId) throw new Error('UserId not set');
 
   const dateString = getToday();
   // TODO: Add user info
   // TODO: Add in a createdAt, updatedAt timesetamp, and merge the updates rather than over-writing
   let docRef: firebase.firestore.DocumentReference<firebase.firestore.DocumentData> | void;
   if (problem?.id) {
-    docRef = await db.collection('users').doc(userId).collection('users').doc(userId).collection('problems').doc(problem.id).set(problem);
+    docRef = await db.collection('users').doc(userId).collection('problems').doc(problem.id).set(problem);
   } else {
     docRef = await db.collection('users').doc(userId).collection('problems').add(problem);
   }
@@ -49,8 +49,11 @@ export async function saveProblem(userId: string, problem: Partial<Problem>): Pr
 /**
  * Retrieve a list of all problems for the current day
  */
-export async function retrieveProblems(userId: string|undefined, date: string = getToday()): Promise<Problem[]|undefined> {
-  if (!userId) return
+export async function retrieveProblems(
+  userId: string | undefined,
+  date: string = getToday()
+): Promise<Problem[] | undefined> {
+  if (!userId) return;
   const queryResults = await db.collection('users').doc(userId).collection('problems').where('date', '==', date).get();
   const problems = [];
   queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
@@ -61,7 +64,7 @@ export async function retrieveProblems(userId: string|undefined, date: string = 
  * Retrieves an individual problem
  * @throws {Error} If no problem exists for the provided ID
  */
-export async function retrieveProblem(userId: string|undefined, problemId): Promise<Problem | undefined> {
+export async function retrieveProblem(userId: string | undefined, problemId): Promise<Problem | undefined> {
   if (!problemId || !userId) return;
 
   const docSnapshot = await db.collection('users').doc(userId).collection('problems').doc(problemId).get();
@@ -70,8 +73,8 @@ export async function retrieveProblem(userId: string|undefined, problemId): Prom
   return problem as Problem;
 }
 
-export async function retrieveProblemRange(userId: string, dateRange: DateRanges): Promise<Problem[]|undefined> {
-  if (!userId) return
+export async function retrieveProblemRange(userId: string, dateRange: DateRanges): Promise<Problem[] | undefined> {
+  if (!userId) return;
 
   const startDate = {
     [DateRanges.TODAY]: getToday(),
@@ -84,11 +87,7 @@ export async function retrieveProblemRange(userId: string, dateRange: DateRanges
 
   let queryResults: firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>;
   if (startDate) {
-    queryResults = await db
-      .collection('users').doc(userId)
-      .collection('problems')
-      .where('date', '>=', startDate)
-      .get();
+    queryResults = await db.collection('users').doc(userId).collection('problems').where('date', '>=', startDate).get();
   } else {
     queryResults = await db.collection('users').doc(userId).collection('problems').get();
   }
@@ -99,7 +98,15 @@ export async function retrieveProblemRange(userId: string, dateRange: DateRanges
 }
 
 export async function deleteProblem(userId: string, problemId: string): Promise<void> {
-  if (!userId) throw new Error('UserId not set')
+  if (!userId) throw new Error('UserId not set');
   await db.collection('users').doc(userId).collection('problems').doc(problemId).delete();
-  return
+  return;
+}
+
+export async function saveRootCause(userId: string, problemId: string, rootCauseText: string): Promise<void> {
+  if (!userId) throw new Error('UserId not set');
+  if (!problemId) throw new Error('problemId not set');
+
+  await db.collection('users').doc(userId).collection('problems').doc(problemId).update({ rootCause: rootCauseText });
+  return;
 }
