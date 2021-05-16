@@ -30,7 +30,7 @@ export default function DefineProblemPage() {
 
   async function handleRootCauseSave(e) {
     e.preventDefault();
-    await saveRootCause(user.uid, problem, rootCause, !problem.rootCause?.trim());
+    await saveRootCause(user.uid, problem, rootCause);
     setCurrentSection(Section.GENERATEIDEAS);
   }
 
