@@ -9,6 +9,11 @@ export interface Problem {
   rootCause?: string;
 }
 
+export interface Stats {
+  totalProblems: number;
+  rootCauseProblems: number;
+}
+
 
 export enum DateRanges {
   TODAY = 'today',

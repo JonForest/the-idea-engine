@@ -17,7 +17,7 @@ export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPane
   async function deleteAction(e: React.SyntheticEvent, problemId: string) {
     e.preventDefault(); // probably superfluous
     e.stopPropagation(); // necessary to stop navigation to the problem
-    await deleteProblem(user.uid, problemId);
+    await deleteProblem(user.uid, problem);
     if (!onDelete) throw new Error('onDelete not specified');
     await onDelete();
   }

@@ -5,9 +5,10 @@ import { useRouter } from 'next/router';
 import ProblemPanel from '../components/problem_panel';
 import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
-import { getToday, retrieveProblems } from '../utils/data_connectivity';
+import { fetchProblemStats, getToday, retrieveProblems } from '../utils/data_connectivity';
 import { useGesture } from 'react-use-gesture';
 import useUser from '../utils/hooks';
+import AnimatedBadge from '../components/animated_badge';
 
 const panels = [1, 2, 3, 4, 5];
 
@@ -18,6 +19,7 @@ export default function Home() {
   const [offsetPosition, setOffsetPosition] = useState<number>(0);
   const today = getToday();
   const { data } = useSWR(today + user?.uid, () => retrieveProblems(user?.uid, today));
+  const { data: stats } = useSWR(user?.uid, () => fetchProblemStats(user?.uid));
 
   const bind = useGesture(
     {
@@ -54,6 +56,18 @@ export default function Home() {
           </a>
         </Link>
       </BufferedContent>
+      <BufferedContent>
+        {stats && (
+          <div className="flex flex-col text-2xl">
+            <div className="mt-10">
+              <AnimatedBadge targetValue={stats.rootCauseProblems} /> Root cause identified
+            </div>
+            <div className="mt-12">
+              <AnimatedBadge targetValue={stats.totalProblems - stats.rootCauseProblems} /> Unclassified problems
+            </div>
+          </div>
+        )}
+      </BufferedContent>
 
       <div className="mt-12">
         <BufferedContent>
@@ -76,7 +90,10 @@ export default function Home() {
                   <ProblemPanel
                     problem={problem}
                     onClick={() => router.push(`edit_problem/${problem.id}`)}
-                    onDelete={() => mutate(today + user.uid)}
+                    onDelete={() => {
+                      mutate(today + user.uid)
+                      mutate(user.uid)
+                    }}
                   />
                 </div>
               ))}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Router from 'next/router';
 import firebase from 'firebase';
 import { isEmptyObj } from './utils';
@@ -31,4 +31,16 @@ export default function useUser({ redirectTo = '/login', redirectIfFound = false
 
   // User is either undefined while loading, or a firebase.User if loaded
   return {user: !user || isEmptyObj(user) ? undefined : user as firebase.User};
+}
+
+export function usePrevious(value: any) {
+  // The ref object is a generic container whose current property is mutable ...
+  // ... and can hold any value, similar to an instance property on a class
+  const ref = useRef();
+  // Store current value in ref
+  useEffect(() => {
+    ref.current = value;
+  }, [value]); // Only re-run if value changes
+  // Return previous value (happens before update in useEffect above)
+  return ref.current;
 }
