@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,43 +7,86 @@ import Layout from '../components/layout';
 import BufferedContent from '../components/buffered_content';
 import { fetchProblemStats, getToday, retrieveProblems } from '../utils/data_connectivity';
 import { useGesture } from 'react-use-gesture';
-import useUser from '../utils/hooks';
+import useUser, { useLeft, useRefArray } from '../utils/hooks';
 import AnimatedBadge from '../components/animated_badge';
-
-const panels = [1, 2, 3, 4, 5];
+import { animate } from 'framer-motion';
 
 export default function Home() {
   const { user } = useUser();
+  const panelWidth = 288;
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
+  const [windowWidth, setWindowWidth] = useState<number>(414); // default iPhone 6/7/8
   const router = useRouter();
   const [offsetPosition, setOffsetPosition] = useState<number>(0);
   const today = getToday();
   const { data } = useSWR(today + user?.uid, () => retrieveProblems(user?.uid, today));
   const { data: stats } = useSWR(user?.uid, () => fetchProblemStats(user?.uid));
+  const left = useLeft(panelWidth);
+  const refs = useRefArray();
+
+  useEffect(() => {
+    if (window) setWindowWidth(window.innerWidth);
+  }, []);
+
+  useEffect(() => {
+    if (!data) return;
+
+    if (selectedPanelIndex >= data.length) {
+      console.log('Reset the offset');
+      returnAnimate(data.length - 1);
+    }
+  }, [data]);
 
   const bind = useGesture(
     {
       onDrag: ({ event, movement: [mx, my] }) => {
-        // console.log(event);
-        // event.preventDefault();
         event.stopPropagation();
         event.preventDefault();
-        console.log(event);
-        console.log(mx, my);
         setOffsetPosition(mx);
       },
       onDragEnd: ({ event }) => {
-        console.log('drag ending');
+        // Fetch list of values showing the amount of the panel showing on screen
+        const pixelsDisplaying = refs.current.map((item) => {
+          let showingPixels = panelWidth;
+          const itemLeft = item.offsetLeft;
+
+          if (itemLeft < 0) showingPixels += itemLeft; // itemLeft is negative, so using a + will still reduce showingPixels
+
+          const overhang = itemLeft + panelWidth - windowWidth;
+          if (overhang > 0) showingPixels -= overhang;
+          return showingPixels;
+        });
+        const showingProblemIndex = pixelsDisplaying.indexOf(Math.max(...pixelsDisplaying));
+        return returnAnimate(showingProblemIndex);
       },
     },
     {
-      // eventOptions: { passive: false },
       drag: {
         filterTaps: true,
         initial: () => [offsetPosition, 0],
       },
     }
   );
+
+  /**
+   * Wherever the panels are now, animate the showing panel back to the middle of the screen
+   */
+  function returnAnimate(showingPanel: number) {
+    setSelectedPanelIndex(showingPanel);
+
+    const targetOffset = showingPanel * -(panelWidth + 50);
+
+    const controls = animate(offsetPosition, targetOffset, {
+      type: 'spring',
+      stiffness: 70,
+      onUpdate: (value) => {
+        console.log(value);
+        setOffsetPosition(value);
+      },
+      onComplete: () => {},
+    });
+    return () => controls.stop();
+  }
 
   return (
     <Layout>
@@ -79,11 +122,13 @@ export default function Home() {
             {data &&
               data.map((problem, index) => (
                 <div
+                  id={problem.id}
                   key={problem.id}
+                  ref={refs}
                   style={{
                     touchAction: 'pan-y',
                     position: 'absolute',
-                    left: `${(index - selectedPanelIndex) * 330 + 120 + offsetPosition}px`,
+                    left: `${index * 330 + left + offsetPosition}px`,
                   }}
                   {...bind()}
                 >
@@ -91,8 +136,8 @@ export default function Home() {
                     problem={problem}
                     onClick={() => router.push(`edit_problem/${problem.id}`)}
                     onDelete={() => {
-                      mutate(today + user.uid)
-                      mutate(user.uid)
+                      mutate(today + user.uid);
+                      mutate(user.uid);
                     }}
                   />
                 </div>
@@ -103,11 +148,3 @@ export default function Home() {
     </Layout>
   );
 }
-
-//     <ProblemPanel
-// problem={problem}
-// onClick={() =>
-//   index === selectedPanelIndex
-//     ? router.push(`edit_problem/${problem.id}`)
-//     : setSelectedPanelIndex(index)
-// }

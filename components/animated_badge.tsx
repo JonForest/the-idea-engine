@@ -9,7 +9,7 @@ export default function AnimatedBadge({ targetValue }: AnimatedBadgeInterface) {
   const ref = useRef();
 
   const previousValue = usePrevious(targetValue) || 0
-  console.log('target, previous', targetValue, previousValue)
+  // console.log('target, previous', targetValue, previousValue)
 
   useEffect(() => {
     // Quick function to make the duration bigger as have a bigger gap, but not log, not linear
