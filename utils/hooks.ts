@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Router from 'next/router';
 import firebase from 'firebase';
 import { isEmptyObj } from './utils';
-import { tryGetPreviewData } from 'next/dist/next-server/server/api-utils';
+import { panelWidth, panelHeight } from '../components/problem_panels/problem_panel';
 
 interface useUserInterface {
   redirectTo?: string;
@@ -48,12 +48,14 @@ export function usePrevious(value: any) {
   return ref.current;
 }
 
-export function useLeft(size: number): number {
+export function useLeft(size: number, maxVal: number = 0): number {
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 414; // iphone 6/7/8 width
   const [left, setLeft] = useState<number>(0);
   useEffect(() => {
-    const width = window.innerWidth;
-    setLeft((width - size) / 2);
-  }, [size]);
+    const width = windowWidth
+    const proposedLeft = (width - size) / 2;
+    setLeft(maxVal && proposedLeft > maxVal ? maxVal : proposedLeft);
+  }, [size, windowWidth]);
 
   return left;
 }
@@ -62,19 +64,32 @@ export function useLeft(size: number): number {
  * Allows many DOM nodes of the same type to use the same "ref", meaning we can perserve them across renders
  * and use for things like animations.
  */
- export function useRefArray() {
-  const ref = useRef([])
+export function useRefArray() {
+  const ref = useRef([]);
   // Remove any nodes that we had captured, but have been removed from the Dom
-  ref.current = ref.current.filter(item => !!document.getElementById(item.id))
+  ref.current = ref.current.filter((item) => !!document.getElementById(item.id));
 
   const returnFunc = (domNode: any) => {
-    if (domNode && !domNode.id) throw new Error('DomNode must have "id" property to use "useRefArray"')
-    if (domNode && !ref.current.some(item => item.id === domNode.id)) {
-      ref.current.push(domNode)
+    if (domNode && !domNode.id) throw new Error('DomNode must have "id" property to use "useRefArray"');
+    if (domNode && !ref.current.some((item) => item.id === domNode.id)) {
+      ref.current.push(domNode);
     }
-  }
+  };
 
-  returnFunc.current = ref.current
+  returnFunc.current = ref.current;
 
   return returnFunc;
+}
+
+export function useIsScrollable() {
+  const [isScrollable, setIsScrollable] = useState<boolean>(true);
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 414; // iphone 6/7/8 width
+  const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 414;
+
+  useEffect(() => {
+    // if the windowWidth and windowHeight is greater than 3 panels (albeit with no margin), then we won't have scrolling
+    setIsScrollable(!(window && windowWidth > panelWidth * 3 && windowHeight > panelHeight + 100));
+  }, [windowWidth]);
+
+  return isScrollable
 }

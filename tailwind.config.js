@@ -29,6 +29,7 @@ module.exports = {
   variants: {
     extend: {
       boxShadow: ['active'],
+      margin: ['first']
     },
   },
   plugins: [require('@tailwindcss/forms')],

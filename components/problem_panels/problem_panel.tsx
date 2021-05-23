@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { FaTrash } from 'react-icons/fa';
-import { deleteProblem, firebaseAuth } from '../utils/data_connectivity';
-import { Problem } from '../utils/types';
+import { deleteProblem, firebaseAuth } from '../../utils/data_connectivity';
+import { Problem } from '../../utils/types';
 import { useRouter } from 'next/router';
 
 interface ProblemPanelInterface {
@@ -13,7 +13,7 @@ interface ProblemPanelInterface {
 
 export default function ProblemPanel({ problem, onClick, onDelete }: ProblemPanelInterface) {
   const router = useRouter();
-  const user = firebaseAuth.currentUser
+  const user = firebaseAuth.currentUser;
   async function deleteAction(e: React.SyntheticEvent, problemId: string) {
     e.preventDefault(); // probably superfluous
     e.stopPropagation(); // necessary to stop navigation to the problem
@@ -76,3 +76,6 @@ export function ProblemPanelLoading({ delay = 0 }: ProblemPanelLoadingInterface)
     ></div>
   );
 }
+
+export const panelWidth = 288;
+export const panelHeight = 288;
