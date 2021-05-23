@@ -39,7 +39,6 @@ async function manageProblemCounters(userId: string, operation: Operation): Prom
       await db.collection('users').doc(userId).update('totalProblems', firebase.firestore.FieldValue.increment(1));
       break;
     case Operation.ADD_ROOTCAUSE:
-      debugger
       await db.collection('users').doc(userId).update('rootCauseProblems', firebase.firestore.FieldValue.increment(1));
       break;
     case Operation.ADD_SOLUTIONS:

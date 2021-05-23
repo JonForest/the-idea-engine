@@ -33,11 +33,11 @@ export default function Home() {
       <BufferedContent>
         {stats && (
           <div className="flex flex-col text-2xl">
-            <div className="mt-10">
-              <AnimatedBadge targetValue={stats.rootCauseProblems} /> Root cause identified
+            <div className="mt-10 flex">
+              <AnimatedBadge targetValue={stats.rootCauseProblems} /> <span>Root cause identified</span>
             </div>
-            <div className="mt-12">
-              <AnimatedBadge targetValue={stats.totalProblems - stats.rootCauseProblems} /> Unclassified problems
+            <div className="mt-12 flex">
+              <AnimatedBadge targetValue={stats.totalProblems - stats.rootCauseProblems} /> <span>Unclassified problems</span>
             </div>
           </div>
         )}

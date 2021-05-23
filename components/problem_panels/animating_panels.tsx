@@ -4,7 +4,7 @@ import { useGesture } from 'react-use-gesture';
 import { useLeft } from '../../utils/hooks';
 import { motion, animate, motionValue } from 'framer-motion';
 import { Problem } from '../../utils/types';
-const panelMargin = 36;
+const panelMargin = 72;
 
 export interface PanelDisplayInterface {
   problems: Problem[],
@@ -14,11 +14,9 @@ export interface PanelDisplayInterface {
 
 export default function AnimatingPanels({ problems, onDelete, onClick }: PanelDisplayInterface) {
   const left = useLeft(panelWidth, 50);
-  console.log(left)
   const [selectedPanelIndex, setSelectedPanelIndex] = useState<number>(0);
   const draggableRef = useRef(null);
   const animatedControlsRef = useRef(null);
-  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 414; // iphone 6/7/8 width
 
   let x = useRef(motionValue(0));
 
@@ -32,7 +30,6 @@ export default function AnimatingPanels({ problems, onDelete, onClick }: PanelDi
     if (!problems) return;
 
     if (selectedPanelIndex >= problems.length) {
-      console.log('Reset the offset');
       animatedControlsRef.current = returnAnimate(problems.length - 1);
     }
   }, [problems]);
@@ -69,9 +66,10 @@ export default function AnimatingPanels({ problems, onDelete, onClick }: PanelDi
    * Wherever the panels are now, animate the showing panel back to the middle of the screen
    */
   function returnAnimate(showingPanel: number) {
-    setSelectedPanelIndex(showingPanel);
+    if (showingPanel < 0) return
 
-    const targetOffset = showingPanel * -(panelWidth + panelMargin) + left;
+    setSelectedPanelIndex(showingPanel);
+    const targetOffset = showingPanel * -((panelWidth + panelMargin)) + left;
 
     const controls = animate(x.current.get(), targetOffset, {
       type: 'spring',
@@ -94,7 +92,7 @@ export default function AnimatingPanels({ problems, onDelete, onClick }: PanelDi
       >
         {problems &&
           problems.map((problem, index) => (
-            <span id={problem.id} key={problem.id} className="block mx-9 first:mx-0">
+            <span id={problem.id} key={problem.id} className="block ml-9 mr-9 first:ml-0">
               <ProblemPanel
                 problem={problem}
                 onClick={() => onClick(problem.id)}
