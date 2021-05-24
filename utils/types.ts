@@ -7,6 +7,7 @@ export interface Problem {
   date: DateString;
   isProcessed: boolean;
   rootCause?: string;
+  createdAt: firebase.default.firestore.FieldValue | string;
 }
 
 export interface Stats {

@@ -68,8 +68,9 @@ export function getToday(): DateString {
  */
 export async function saveProblem(userId: string, problem: Partial<Problem>): Promise<void> {
   if (!userId) throw new Error('UserId not set');
+  problem.createdAt = firebase.firestore.FieldValue.serverTimestamp();
 
-  const dateString = getToday();
+  // const dateString = getToday();
   // TODO: Add user info
   // TODO: Add in a createdAt, updatedAt timesetamp, and merge the updates rather than over-writing
   let docRef: firebase.firestore.DocumentReference<firebase.firestore.DocumentData> | void;
@@ -77,7 +78,7 @@ export async function saveProblem(userId: string, problem: Partial<Problem>): Pr
     await db.collection('users').doc(userId).collection('problems').doc(problem.id).set(problem);
   } else {
     await db.collection('users').doc(userId).collection('problems').add(problem);
-    manageProblemCounters(userId, Operation.ADD_PROBLEM)
+    manageProblemCounters(userId, Operation.ADD_PROBLEM);
   }
 }
 
@@ -92,7 +93,8 @@ export async function retrieveProblems(
   const queryResults = await db.collection('users').doc(userId).collection('problems').where('date', '==', date).get();
   const problems = [];
   queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
-  return problems;
+  const sortedProblems = problems.sort((resa, resb) => resa.createdAt.seconds - resb.createdAt.seconds);
+  return sortedProblems;
 }
 
 /**
@@ -129,13 +131,14 @@ export async function retrieveProblemRange(userId: string, dateRange: DateRanges
 
   const problems = [];
   queryResults.forEach((result) => problems.push({ ...result.data(), id: result.id }));
-  return problems;
+  const sortedProblems = problems.sort((resa, resb) => (resa.createdAt?.seconds || 1) - (resb.createdAt?.seconds || 1));
+  return sortedProblems;
 }
 
 export async function deleteProblem(userId: string, problem: Partial<Problem>): Promise<void> {
   if (!userId) throw new Error('UserId not set');
   await db.collection('users').doc(userId).collection('problems').doc(problem.id).delete();
-  const operation  = !!problem.rootCause ? Operation.DELETE_PROBLEM_WITH_ROOTCAUSE : Operation.DELETE_PROBLEM;
+  const operation = !!problem.rootCause ? Operation.DELETE_PROBLEM_WITH_ROOTCAUSE : Operation.DELETE_PROBLEM;
   await manageProblemCounters(userId, operation);
   return;
 }
@@ -145,7 +148,7 @@ export async function saveRootCause(userId: string, problem: Partial<Problem>, r
   if (!problem) throw new Error('problem not set');
 
   await db.collection('users').doc(userId).collection('problems').doc(problem.id).update({ rootCause: rootCauseText });
-  !problem.rootCause?.trim() && await manageProblemCounters(userId, Operation.ADD_ROOTCAUSE)
+  !problem.rootCause?.trim() && (await manageProblemCounters(userId, Operation.ADD_ROOTCAUSE));
   return;
 }
 
@@ -153,7 +156,7 @@ export async function saveRootCause(userId: string, problem: Partial<Problem>, r
  * Fetches the problem stats (e.g. total problems, etc) for use on the dashboard
  */
 export async function fetchProblemStats(userId: string): Promise<Stats> {
-  if (!userId) return
-  const docSnapshot = await db.collection('users').doc(userId).get()
-  return docSnapshot.data() as Stats
+  if (!userId) return;
+  const docSnapshot = await db.collection('users').doc(userId).get();
+  return docSnapshot.data() as Stats;
 }
