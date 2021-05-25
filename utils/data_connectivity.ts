@@ -1,3 +1,4 @@
+// todo: Move into data_connectivity folder
 import firebase from 'firebase';
 import { Stats } from './types';
 
@@ -25,7 +26,7 @@ enum Operation {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-const db = firebase.firestore();
+export const db = firebase.firestore();
 
 function formatDate(date: Date): DateString {
   const padElement = (dateEle: number): string => (dateEle < 10 ? '0' + String(dateEle) : String(dateEle));
@@ -67,16 +68,14 @@ export function getToday(): DateString {
  * Save a problem (either new or existing) to the database
  */
 export async function saveProblem(userId: string, problem: Partial<Problem>): Promise<void> {
+  //todo: does this ever get called without a userId? Why am I checking when the param is not optional?
   if (!userId) throw new Error('UserId not set');
-  problem.createdAt = firebase.firestore.FieldValue.serverTimestamp();
 
-  // const dateString = getToday();
-  // TODO: Add user info
-  // TODO: Add in a createdAt, updatedAt timesetamp, and merge the updates rather than over-writing
-  let docRef: firebase.firestore.DocumentReference<firebase.firestore.DocumentData> | void;
   if (problem?.id) {
+    problem.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('users').doc(userId).collection('problems').doc(problem.id).set(problem);
   } else {
+    problem.createdAt = firebase.firestore.FieldValue.serverTimestamp();
     await db.collection('users').doc(userId).collection('problems').add(problem);
     manageProblemCounters(userId, Operation.ADD_PROBLEM);
   }
@@ -160,3 +159,4 @@ export async function fetchProblemStats(userId: string): Promise<Stats> {
   const docSnapshot = await db.collection('users').doc(userId).get();
   return docSnapshot.data() as Stats;
 }
+

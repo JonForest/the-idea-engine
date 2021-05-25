@@ -1,11 +1,13 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import BufferedContent from '../../components/buffered_content';
 import Layout from '../../components/layout';
 import ProgressStep from '../../components/progress_step';
 import { retrieveProblem, saveRootCause } from '../../utils/data_connectivity';
+import { retrieveSolutions, saveSolution } from '../../utils/data_connectivity/solutions';
 import useUser from '../../utils/hooks';
+import { Solution } from '../../utils/types';
 
 enum Section {
   ROOTCAUSE = 'rootcause',
@@ -17,10 +19,13 @@ export default function DefineProblemPage() {
   const router = useRouter();
   const [currentSection, setCurrentSection] = useState<Section>(Section.ROOTCAUSE);
   const [rootCause, setRootCause] = useState<string>('');
+  const [currentSolution, setCurrentSolution] = useState<string>('');
   const problemId = router.query.problemId as string;
   const { data: problem, error } = useSWR(problemId + user?.uid, () => retrieveProblem(user?.uid, problemId));
+  const { data: solutions, error: solutionError } = useSWR('solutions' + problemId + user?.uid, () => retrieveSolutions(user?.uid, problemId));
 
   const isSubmittable = !!rootCause.trim();
+  const isCurrentSolutionSubmittable = !!currentSolution.trim();
 
   useEffect(() => {
     if (problem) {
@@ -32,6 +37,19 @@ export default function DefineProblemPage() {
     e.preventDefault();
     await saveRootCause(user.uid, problem, rootCause);
     setCurrentSection(Section.GENERATEIDEAS);
+  }
+
+  async function handleCurrentSolutionSave(e) {
+    e.preventDefault();
+    if (currentSolution.trim() === '') return
+
+    const solution: Partial<Solution> = {
+      problemId: problem.id,
+      description: currentSolution,
+    }
+    await saveSolution(user.uid, solution);
+    mutate('solutions' + problemId + user?.uid)
+    setCurrentSolution('')
   }
 
   return (
@@ -74,7 +92,29 @@ export default function DefineProblemPage() {
             isLoading={false}
             isCurrent={currentSection == Section.GENERATEIDEAS}
             clickAction={() => setCurrentSection(Section.GENERATEIDEAS)}
-          ></ProgressStep>
+          >
+            {currentSection === Section.GENERATEIDEAS && (<>
+                <textarea
+                  className="w-full h-80 lg:h-60 text-gray-800"
+                  value={currentSolution}
+                  onChange={(e) => setCurrentSolution(e.target.value)}
+                />
+                <button
+                  type="button"
+                  disabled={!isCurrentSolutionSubmittable}
+                  onClick={handleCurrentSolutionSave}
+                  className={`w-full text-xl px-4 py-1 rounded-sm ${
+                    isCurrentSolutionSubmittable ? ' bg-green-700 text-white shadow-md' : ' bg-gray-600 text-gray-200'
+                  }`}
+                >
+                  Save
+                </button>
+              </>
+            )}
+
+            {solutions && solutions.map(solution => <div key={solution.id}>{solution.description}</div>)}
+
+          </ProgressStep>
         </ul>
       </BufferedContent>
     </Layout>
