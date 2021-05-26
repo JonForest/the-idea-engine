@@ -4,6 +4,7 @@ import useSWR, { mutate } from 'swr';
 import BufferedContent from '../../components/buffered_content';
 import Layout from '../../components/layout';
 import ProgressStep from '../../components/progress_step';
+import ViewSolution from '../../components/solution/view_solution';
 import { retrieveProblem, saveRootCause } from '../../utils/data_connectivity';
 import { retrieveSolutions, saveSolution } from '../../utils/data_connectivity/solutions';
 import useUser from '../../utils/hooks';
@@ -22,7 +23,11 @@ export default function DefineProblemPage() {
   const [currentSolution, setCurrentSolution] = useState<string>('');
   const problemId = router.query.problemId as string;
   const { data: problem, error } = useSWR(problemId + user?.uid, () => retrieveProblem(user?.uid, problemId));
-  const { data: solutions, error: solutionError } = useSWR('solutions' + problemId + user?.uid, () => retrieveSolutions(user?.uid, problemId));
+  const {
+    data: solutions,
+    error: solutionError,
+    mutate: mutateSolutions,
+  } = useSWR('solutions' + problemId + user?.uid, () => retrieveSolutions(user?.uid, problemId));
 
   const isSubmittable = !!rootCause.trim();
   const isCurrentSolutionSubmittable = !!currentSolution.trim();
@@ -41,21 +46,21 @@ export default function DefineProblemPage() {
 
   async function handleCurrentSolutionSave(e) {
     e.preventDefault();
-    if (currentSolution.trim() === '') return
+    if (currentSolution.trim() === '') return;
 
     const solution: Partial<Solution> = {
       problemId: problem.id,
       description: currentSolution,
-    }
+    };
     await saveSolution(user.uid, solution);
-    mutate('solutions' + problemId + user?.uid)
-    setCurrentSolution('')
+    mutate('solutions' + problemId + user?.uid);
+    setCurrentSolution('');
   }
 
   return (
     <Layout>
       <BufferedContent>
-        <ul className="list-none w-full">
+        <ul className="list-none w-full mb-8">
           <ProgressStep title="Problem" isLoading={!problem}>
             {problem?.problem}
           </ProgressStep>
@@ -93,7 +98,8 @@ export default function DefineProblemPage() {
             isCurrent={currentSection == Section.GENERATEIDEAS}
             clickAction={() => setCurrentSection(Section.GENERATEIDEAS)}
           >
-            {currentSection === Section.GENERATEIDEAS && (<>
+            {currentSection === Section.GENERATEIDEAS && (
+              <>
                 <textarea
                   className="w-full h-80 lg:h-60 text-gray-800"
                   value={currentSolution}
@@ -112,8 +118,12 @@ export default function DefineProblemPage() {
               </>
             )}
 
-            {solutions && solutions.map(solution => <div key={solution.id}>{solution.description}</div>)}
-
+            {solutions &&
+              solutions.map((solution) => (
+                <div key={solution.id} className="mt-8">
+                <ViewSolution solution={solution} onDelete={() => mutateSolutions()} />
+                </div>
+              ))}
           </ProgressStep>
         </ul>
       </BufferedContent>

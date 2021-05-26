@@ -26,3 +26,8 @@ export async function retrieveSolutions(userId: string | undefined, problemId: s
   const sortedsolutions = solutions.sort((resa, resb) => resa.createdAt.seconds - resb.createdAt.seconds);
   return sortedsolutions;
 }
+
+export async function deleteSolution(userId: string, solutionId: string): Promise<void> {
+  await db.collection('users').doc(userId).collection('solutions').doc(solutionId).delete()
+  return
+}
