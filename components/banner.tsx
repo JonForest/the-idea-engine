@@ -7,7 +7,7 @@ interface BannerInterface {
 
 export default function Banner({ showMenu = true }: BannerInterface) {
   return (
-    <div className="fixed w-full top-0 px-8 text-gray-100 text-2xl lg:text-5xl font-bold pt-4 pb-4 bg-gray-600 shadow-xl">
+    <div className="fixed w-full top-0 px-8 text-gray-100 text-2xl lg:text-5xl font-bold pt-4 pb-4 bg-gray-600 shadow-xl z-10">
       <Link href="/">
         <a>the idea engine</a>
       </Link>

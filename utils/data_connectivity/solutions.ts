@@ -23,7 +23,7 @@ export async function retrieveSolutions(userId: string | undefined, problemId: s
     .get();
   const solutions = [];
   queryResults.forEach((result) => solutions.push({ ...result.data(), id: result.id }));
-  const sortedsolutions = solutions.sort((resa, resb) => resa.createdAt.seconds - resb.createdAt.seconds);
+  const sortedsolutions = solutions.sort((resa, resb) => resb.createdAt.seconds - resa.createdAt.seconds);
   return sortedsolutions;
 }
 
